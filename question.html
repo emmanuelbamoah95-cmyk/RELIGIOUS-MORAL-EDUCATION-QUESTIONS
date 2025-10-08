@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Religious and Moral Education Quiz</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2c3e50;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .instructions {
+            background-color: #e8f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions h2 {
+            color: #2980b9;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .quiz-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .score-display {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .question-counter {
+            background: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-prev {
+            background-color: #e67e22;
+        }
+        
+        .btn-next {
+            background-color: #27ae60;
+        }
+        
+        .btn-download {
+            background-color: #9b59b6;
+        }
+        
+        .btn-reset {
+            background-color: #e74c3c;
+        }
+        
+        .question-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3498db;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .question-number::before {
+            content: "Q";
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .question-text {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .option:hover {
+            background-color: #f5f5f5;
+            border-color: #bdc3c7;
+        }
+        
+        .option.selected {
+            background-color: #d6eaf8;
+            border-color: #3498db;
+            font-weight: bold;
+        }
+        
+        .option.correct {
+            background-color: #d5f5e3;
+            border-color: #27ae60;
+        }
+        
+        .option.incorrect {
+            background-color: #fadbd8;
+            border-color: #e74c3c;
+        }
+        
+        .option-label {
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .completion-message {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            color: white;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .completion-message h2 {
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .quiz-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .navigation-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        .question-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .question-list-item {
+            background: #ecf0f1;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .question-list-item:hover {
+            background: #bdc3c7;
+        }
+        
+        .question-list-item.current {
+            background: #3498db;
+            color: white;
+        }
+        
+        .question-list-item.answered {
+            background: #27ae60;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="quiz-container">
+        <header>
+            <h1>Religious and Moral Education Quiz</h1>
+            <p class="subtitle">Test your knowledge with these 40 multiple-choice questions</p>
+        </header>
+        
+        <section class="instructions">
+            <h2>📝 Instructions</h2>
+            <ul>
+                <li>Select one answer for each question by clicking on the option</li>
+                <li>Use the Previous and Next buttons to navigate between questions</li>
+                <li>You can also jump to any question using the question grid below</li>
+                <li>Your score will be calculated based on correct answers</li>
+                <li>Click "Download PDF" to save your answers</li>
+            </ul>
+        </section>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div class="question-list" id="question-list">
+            <!-- Question list will be generated by JavaScript -->
+        </div>
+        
+        <div class="quiz-controls">
+            <div class="quiz-info">
+                <div class="score-display">Score: <span id="score">0</span>/40</div>
+                <div class="question-counter">Question: <span id="current-question">1</span>/40</div>
+            </div>
+            <div class="navigation-buttons">
+                <button class="btn btn-prev" id="prev-btn">← Previous</button>
+                <button class="btn btn-next" id="next-btn">Next →</button>
+            </div>
+        </div>
+        
+        <div class="question-container" id="question-display">
+            <!-- Question content will be loaded here by JavaScript -->
+        </div>
+        
+        <div class="completion-message" id="completion-message">
+            <h2>🎉 Quiz Completed! 🎉</h2>
+            <p>You've answered all the questions. Your final score is <span id="final-score">0</span>/40.</p>
+            <p>Click "Download PDF" to save your results or "Reset Quiz" to try again.</p>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-download" id="download-pdf">Download PDF</button>
+            <button class="btn btn-reset" id="reset-btn">Reset Quiz</button>
+        </div>
+        
+        <footer>
+            <p>Religious and Moral Education Question Paper | All rights reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        // Quiz data - questions and correct answers
+        const quizData = [
+            { question: "Mercy, a Christian wants her congregation to pray for her brother who is falsely accused of a crime he never committed. Which type of prayer should the church engage in?", options: ["Confession", "Supplication", "Thanksgiving", "Intercessory"], answer: 3 },
+            { question: "Christians sometimes go round in their community to share Bible knowledge with unbelievers. This practice of winning more souls is known as", options: ["Bible studies.", "Crusade.", "Evangelism.", "Preaching."], answer: 2 },
+            { question: "In the customs and the traditions of the Asantes, your father's brother is your", options: ["uncle.", "father."], answer: 1 },
+            { question: "God is called by different languages with different names. Among the Ga people, God is referred to as Ataa-Naa Nyonmo. This is interpreted as", options: ["The Supreme Being who is both male and female.", "The Loving One.", "The Omnipotent God.", "The one who never fails or the Dependable One."], answer: 0 },
+            { question: "During Islamic prayer when the believer places his or her face on the ground from a kneeling position it is called", options: ["Ruku.", "Qiyam.", "Takbir.", "Sajdah."], answer: 3 },
+            { question: "When a Sisala boy reaches the age of manhood, he is called Baala. Baala means", options: ["adult.", "adolescent.", "uncle.", "a man."], answer: 3 },
+            { question: "A collection of what Muslims in Muhammad's time saw, followed and passed unto generations is known as", options: ["Hadith.", "Sunnah.", "Qur'an.", "Pentateuch."], answer: 1 },
+            { question: "Which of the following recitals is used in Islamic worship to call worshipers to prayer?", options: ["The Adhan", "Al-Ikhlas", "Al-Fathiha", "The Shahadah"], answer: 0 },
+            { question: "The crab cannot give birth to a bird. This expression in indigenous religion teaches that", options: ["children show the character of their parents.", "a crab does not resemble a bird.", "a crab and a bird cannot be friends.", "a pregnant crab cannot born a bird."], answer: 0 },
+            { question: "Young people who preserve their chastity are very much likely to", options: ["get married very late in life.", "complete their education without interruptions.", "lose their intelligence.", "suffer in giving birth in the future."], answer: 1 },
+            { question: "Drug use and abuse has consequences on the youth of today. The youth are abusing all the following drugs except", options: ["red.", "chlorine.", "tramol.", "wee."], answer: 1 },
+            { question: "An activity which is meant to achieve a purpose is usually classified as", options: ["income.", "religion.", "work.", "entrepreneurship."], answer: 2 },
+            { question: "There are many virtues that are accepted and desirable by many societies in Ghana. One of such important virtues is", options: ["scornfulness.", "disdain.", "contemptuous.", "abstinence."], answer: 3 },
+            { question: "All the three major religious groups in Ghana encourage decent dressing. Which of the following religious groups makes it mandatory for their women to dress in a modest and decent way?", options: ["Christians", "Traditionalist", "Shintoists", "Muslims"], answer: 3 },
+            { question: "After Jesus' fasting, the devil tempted him three times. What was the second temptation about?", options: ["Turning stones into bread", "Jesus bowing down and worship the devil", "Jesus was to throw himself down from a pinnacle."], answer: 2 },
+            { question: "Abu is a Muslim who attends a Christian secondary school. The school authorities does not allow him to join other Muslims in town for Juma prayer on Fridays. What must he do to enjoy his religious rights?", options: ["He must stop the Christian school and go to a Muslim school", "He must formally petition the school board", "He must take the matter to the Supreme Court of Ghana", "He should organize the Zongo boys to take action against the school authorities"], answer: 1 },
+            { question: "Our grandparents are a blessing to the nuclear family because they:", options: ["settle dispute between the father and the mother.", "over pumper the children.", "take care of the children when parents have gone to work.", "act as self appointed medical officers of the home."], answer: 2 },
+            { question: "A major tool employ by the traditional worshiper during worship is", options: ["oral tradition.", "charm.", "holy book.", "magic."], answer: 0 },
+            { question: "In the ancient days, people suffering from ...... were not allowed to intermingle with members of the community.", options: ["epilepsy", "tuberculosis", "malaria", "leprosy"], answer: 3 },
+            { question: "Apart from the five mandatory prayer in Islam, there are several kinds of prayers Muslims observe. A Prayer that is said to glorify Allah in Islam is called", options: ["Sadaqah.", "Al-masakin.", "Dhikr.", "Misbahah."], answer: 2 },
+            { question: "Showing respect and obedience to school authority ensures", options: ["repentance and forgiveness.", "success in examination.", "winning of trophies and wards.", "harmonious environment."], answer: 3 },
+            { question: "The ark Noah built saved how many people?", options: ["5", "6", "7", "8"], answer: 3 },
+            { question: "Which Islamic leader divided the Muslim Empire into provinces and autonomous territories?", options: ["Uthman Bin Affan", "Abubakar", "Umar Ibn Khatab", "Muhammad"], answer: 2 },
+            { question: "In Islamic marriage, there is merry-making in feasting. What is the Islamic term used to describe the statement?", options: ["Nikah", "Walmah", "Lelley", "Leefey"], answer: 1 },
+            { question: "All the three major religious groups in Ghana accept that God is the creator of the universe and everything in it. What did God create on the 3rd Day from Christian point of view?", options: ["Light and darkness", "Land, sea and vegetation", "Sky and water bodies", "Sun, moon and stars"], answer: 1 },
+            { question: "The rites of passage is very important in the traditional society because it", options: ["is a vehicle through which culture is transmitted.", "creates wealth for people.", "promotes entertainment for local people.", "makes the gods happy."], answer: 0 },
+            { question: "A person who is humble", options: ["is advised by everybody.", "loves everybody.", "listens to advice.", "makes everybody his friend."], answer: 2 },
+            { question: "Which of the Commandments in Christianity places value on human life?", options: ["10th Commandment", "8th Commandment", "6th Commandment", "4th Commandment"], answer: 2 },
+            { question: "What is the primary purpose of religious songs?", options: ["To confuse listeners", "To express beliefs and values", "To promote competition", "To entertain"], answer: 1 },
+            { question: "Dr Frimpong is a medical doctor in a renowned Hospital. The type of his work can be described as", options: ["community work.", "important work.", "academic work.", "occupational work."], answer: 3 },
+            { question: "Promotion of chastity is a concern for all Ghanaians. This concern has arisen because the youth is", options: ["uneducated.", "unemployed.", "sexually active.", "engaging in teenage pregnancies."], answer: 3 },
+            { question: "Everything God created is a resource for man. Which of the following creations of God, helps in the production of salt?", options: ["Plants", "Machines", "Stars", "Sun"], answer: 3 },
+            { question: "The Shahada in Islamic religion proclaims that", options: ["Muhammad is the son of Allah.", "Muhammad worshiped in Mecca.", "Muhammad is a messenger of God.", "Muhammad was a great leader."], answer: 2 },
+            { question: "According to oral history, Togbe Tsali was a", options: ["king.", "priest.", "fugitive.", "warrior."], answer: 2 },
+            { question: "The Qur'an compels all Muslims to communicate with Allah", options: ["5 times hourly.", "5 times daily.", "5 times weekly.", "5 times yearly."], answer: 1 },
+            { question: "Jesus' powerful preaching that carries blessings was delivered", options: ["in the synagogue.", "on a mountain.", "in Peter's boat.", "on the cross."], answer: 1 },
+            { question: "Kings, chiefs, queens and other traditional leaders derive their authority in or from", options: ["fetish priest.", "the citizens.", "the objects on which they sit.", "the government of Ghana."], answer: 1 },
+            { question: "One of the main reasons why people marry is to have", options: ["a family.", "children.", "a legitimate means of sexual satisfaction.", "a financial breakthrough."], answer: 0 },
+            { question: "Which of the following values would you promote in order to unite the family as one?", options: ["Family dinners", "Ignoring each other", "Working separately", "Avoiding communication"], answer: 0 },
+            { question: "The symbol of unifier for the Ashanti kingdom is the", options: ["Golden Stool.", "Flag of Ghana.", "Okomfo Anokye.", "Otumfour Osei Tutu."], answer: 0 }
+        ];
+
+        // Quiz state
+        let currentQuestion = 0;
+        let userAnswers = Array(quizData.length).fill(null);
+        let score = 0;
+
+        // DOM elements
+        const questionDisplay = document.getElementById('question-display');
+        const questionList = document.getElementById('question-list');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const scoreSpan = document.getElementById('score');
+        const progressBar = document.getElementById('progress');
+        const completionMessage = document.getElementById('completion-message');
+        const finalScoreSpan = document.getElementById('final-score');
+        const downloadBtn = document.getElementById('download-pdf');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Initialize the quiz
+        function initQuiz() {
+            createQuestionList();
+            loadQuestion(currentQuestion);
+            updateProgress();
+            updateNavigation();
+        }
+
+        // Create the question list navigation
+        function createQuestionList() {
+            questionList.innerHTML = '';
+            for (let i = 0; i < quizData.length; i++) {
+                const listItem = document.createElement('div');
+                listItem.className = 'question-list-item';
+                if (i === currentQuestion) {
+                    listItem.classList.add('current');
+                }
+                if (userAnswers[i] !== null) {
+                    listItem.classList.add('answered');
+                }
+                listItem.textContent = i + 1;
+                listItem.addEventListener('click', () => {
+                    currentQuestion = i;
+                    loadQuestion(currentQuestion);
+                    updateQuestionList();
+                    updateNavigation();
+                });
+                questionList.appendChild(listItem);
+            }
+        }
+
+        // Update the question list highlighting
+        function updateQuestionList() {
+            const items = questionList.querySelectorAll('.question-list-item');
+            items.forEach((item, index) => {
+                item.classList.remove('current');
+                if (index === currentQuestion) {
+                    item.classList.add('current');
+                }
+                
+                if (userAnswers[index] !== null) {
+                    item.classList.add('answered');
+                } else {
+                    item.classList.remove('answered');
+                }
+            });
+        }
+
+        // Load a question
+        function loadQuestion(index) {
+            const question = quizData[index];
+            currentQuestionSpan.textContent = index + 1;
+            
+            let optionsHTML = '';
+            question.options.forEach((option, i) => {
+                const isSelected = userAnswers[index] === i;
+                const optionClass = isSelected ? 'option selected' : 'option';
+                optionsHTML += `
+                    <div class="${optionClass}" data-index="${i}">
+                        <div class="option-label">${String.fromCharCode(65 + i)}</div>
+                        <div class="option-text">${option}</div>
+                    </div>
+                `;
+            });
+            
+            questionDisplay.innerHTML = `
+                <div class="question-number">Question ${index + 1}</div>
+                <div class="question-text">${question.question}</div>
+                <div class="options">${optionsHTML}</div>
+            `;
+            
+            // Add event listeners to options
+            const options = questionDisplay.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    const selectedIndex = parseInt(option.getAttribute('data-index'));
+                    userAnswers[index] = selectedIndex;
+                    
+                    // Update UI
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    
+                    // Update score
+                    calculateScore();
+                    
+                    // Update question list
+                    updateQuestionList();
+                });
+            });
+            
+            updateProgress();
+        }
+
+        // Calculate the current score
+        function calculateScore() {
+            score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer !== null && answer === quizData[index].answer) {
+                    score++;
+                }
+            });
+            scoreSpan.textContent = score;
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const answeredCount = userAnswers.filter(answer => answer !== null).length;
+            const progressPercent = (answeredCount / quizData.length) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+        }
+
+        // Update navigation buttons
+        function updateNavigation() {
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.disabled = currentQuestion === quizData.length - 1;
+            
+            // Show completion message if all questions are answered
+            const allAnswered = userAnswers.every(answer => answer !== null);
+            if (allAnswered) {
+                completionMessage.style.display = 'block';
+                finalScoreSpan.textContent = score;
+            } else {
+                completionMessage.style.display = 'none';
+            }
+        }
+
+        // Event listeners for navigation
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion(currentQuestion);
+                updateQuestionList();
+                updateNavigation();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion(currentQuestion);
+                updateQuestionList();
+                updateNavigation();
+            }
+        });
+
+        // Reset quiz
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset the quiz? All your answers will be lost.')) {
+                currentQuestion = 0;
+                userAnswers = Array(quizData.length).fill(null);
+                score = 0;
+                scoreSpan.textContent = score;
+                initQuiz();
+            }
+        });
+
+        // Download PDF
+        downloadBtn.addEventListener('click', () => {
+            const element = document.getElementById('quiz-container');
+            const opt = {
+                margin: 10,
+                filename: 'religious_moral_education_quiz_results.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save();
+        });
+
+        // Initialize the quiz when the page loads
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
